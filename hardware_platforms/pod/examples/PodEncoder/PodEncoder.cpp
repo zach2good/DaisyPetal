@@ -10,43 +10,6 @@ static int32_t  inc;
 
 Color my_colors[5];
 
-static void callback(float *in, float *out, size_t size)
-{
-    // Debounce the encoder at a steady, fixed rate.
-    hw.encoder.Debounce();
-    inc = hw.encoder.Increment();
-    // Change the selected LED based on the increment.
-    if(inc > 0)
-    {
-        led_sel += 1;
-        // Wrap around
-        if(led_sel > NUM_COLORS - 1)
-        {
-            led_sel = 0;
-        }
-    }
-    else if(inc < 0)
-    {
-        // Wrap around
-        if(led_sel == 0)
-        {
-            led_sel = NUM_COLORS - 1;
-        }
-        else
-        {
-            led_sel -= 1;
-        }
-    }
-    if(hw.encoder.RisingEdge())
-    {
-        led_sel = 4;
-    }
-    hw.ClearLeds();
-    hw.led1.SetColor(my_colors[led_sel]);
-    hw.led2.SetColor(my_colors[led_sel]);
-    hw.UpdateLeds();
-}
-
 int main(void)
 {
     hw.Init();
@@ -57,11 +20,43 @@ int main(void)
     my_colors[2].Init(Color::PresetColor::BLUE);
     my_colors[3].Init(Color::PresetColor::WHITE);
     my_colors[4].Init(Color::PresetColor::OFF);
-    // until we have fixed timer callbacks we'll use the audio callback
-    hw.StartAudio(callback);
+    
     while(1)
     {
-        //hw.ClearLeds();
-        //hw.SetLed(static_cast<DaisyPod::Led>(led_sel), 1);
+        // Debounce the encoder at a steady, fixed rate.
+        hw.encoder.Debounce();
+        inc = hw.encoder.Increment();
+        
+        // Change the selected LED based on the increment.
+        if(inc > 0)
+        {
+            led_sel += 1;
+            // Wrap around
+            if(led_sel > NUM_COLORS - 1)
+            {
+                led_sel = 0;
+            }
+        }
+        else if(inc < 0)
+        {
+            // Wrap around
+            if(led_sel == 0)
+            {
+                led_sel = NUM_COLORS - 1;
+            }
+            else
+            {
+                led_sel -= 1;
+            }
+        }
+        
+        if(hw.encoder.RisingEdge())
+        {
+            led_sel = 4;
+        }
+        hw.ClearLeds();
+        hw.led1.SetColor(my_colors[led_sel]);
+        hw.led2.SetColor(my_colors[led_sel]);
+        hw.UpdateLeds();
     }
 }

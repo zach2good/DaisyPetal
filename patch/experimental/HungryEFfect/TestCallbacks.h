@@ -1,12 +1,13 @@
 #pragma once
 
+#include <string.h>
 #include "daisy_patch.h"
 #include "daisysp.h"
 
 using namespace daisy;
 using namespace daisysp;
 
-#define NUM_OSC 25
+#define NUM_OSC 45
 
 class NewClass
 {
@@ -47,11 +48,12 @@ float                                  delaytime;
 float major_chord[4] = {0, 4, 7, 11};
 float minor_chord[4] = {0, 3, 7, 10};
 
-void QuadBypass(float **in, float **out, size_t size) 
+void QuadBypass(float **in, float **out, size_t size)
 {
-    
-    for(size_t i = 0; i < size; i++) {
-        for(size_t chn = 0; chn < 4; chn++) {
+    for(size_t i = 0; i < size; i++)
+    {
+        for(size_t chn = 0; chn < 4; chn++)
+        {
             out[chn][i] = in[chn][i];
         }
     }
@@ -140,18 +142,56 @@ void SimplerCallback(float **in, float **out, size_t size)
     }
 }
 
+float DSY_SDRAM_BSS ramtest[128 * 400];
+
+void Hungry(float **in, float **out, size_t size)
+{
+    hw.seed.SetTestPoint(true);
+    hw.UpdateAnalogControls();
+    hw.DebounceControls();
+    float osig;
+    // Copy *in to ram a million times
+//    uint32_t baseaddr = 0xc0000000;
+    for(size_t i = 0; i < 430; i++) {
+        uint32_t offset = i * (size * sizeof(float));
+        memcpy(ramtest + offset, in[0], size * sizeof(float));
+    }
+    for(size_t i = 0; i < size; i++)
+    {
+		// Process a bunch of Oscillators
+        osig = 0.0f;
+        for(size_t o = 0; o < NUM_OSC; o++)
+        {
+            osig += osc[o].Process();
+        }
+        // Copy the input to the output
+        for(size_t chn = 0; chn < 4; chn++)
+        {
+            if(chn == 0)
+                memcpy(out[chn], &ramtest, size * sizeof(float));
+            else if(chn == 1)
+                out[chn][i] = osig;
+            else 
+				out[chn][i] = in[chn][i];
+        }
+    }
+    hw.seed.SetTestPoint(false);
+}
+
+
 void RunTestCallbacksMain()
 {
     float samplerate;
     // Init
     hw.Init();
     samplerate = hw.AudioSampleRate();
+    hw.SetAudioBlockSize(128);
     verb.Init(samplerate);
     verb.SetLpFreq(12000.0f);
-        for(size_t i = 0; i < NUM_BYTES; i++)
-        {
-            bytes[i] = 0;
-    	}
+    for(size_t i = 0; i < NUM_BYTES; i++)
+    {
+        bytes[i] = 0;
+    }
     for(size_t i = 0; i < NUM_OSC; i++)
     {
         osc[i].Init(samplerate);
@@ -167,11 +207,12 @@ void RunTestCallbacksMain()
         delay[i].SetDelay(initial_delay);
     }
     filter.Init(samplerate);
-    p_xf.init(hw.controls[DaisyPatch::CTRL_1], 20.f, 16000.f, Parameter::LOGARITHMIC);
-    p_res.init(hw.controls[DaisyPatch::CTRL_2], 0.f, 1.f, Parameter::LINEAR);
+    p_xf.Init(
+        hw.controls[DaisyPatch::CTRL_1], 20.f, 16000.f, Parameter::LOGARITHMIC);
+    p_res.Init(hw.controls[DaisyPatch::CTRL_2], 0.f, 1.f, Parameter::LINEAR);
     // Display Test
     hw.StartAdc();
-    hw.StartAudio(QuadBypass);
+    hw.StartAudio(Hungry);
     //    hw.StartAudio(MultiOutputFilter);
     for(;;)
     {

@@ -32,16 +32,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
     <GNUConfigurationType>Debug</GNUConfigurationType>
-    <ToolchainID>com.sysprogs.gnuarm.arm-eabi</ToolchainID>
-    <ToolchainVersion>9.2.1/8.0/r1</ToolchainVersion>
+    <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>
+    <ToolchainVersion>9.2.1/8.3.0/r1</ToolchainVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
-    <ToolchainID>com.sysprogs.gnuarm.arm-eabi</ToolchainID>
-    <ToolchainVersion>9.2.1/8.0/r1</ToolchainVersion>
+    <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>
+    <ToolchainVersion>9.2.1/8.3.0/r1</ToolchainVersion>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../daisysp;../../libdaisy/src;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../daisysp;../../../libdaisy/src;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions />
       <CLanguageStandard />
@@ -52,7 +52,7 @@
       <AdditionalLinkerInputs>;%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
       <LibrarySearchDirectories>;%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
       <AdditionalLibraryNames>;%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
-      <LinkerScript>../../libdaisy/core/STM32H750IB_flash.lds</LinkerScript>
+      <LinkerScript>../../../libdaisy/core/STM32H750IB_flash.lds</LinkerScript>
       <AdditionalOptions />
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
@@ -62,14 +62,6 @@
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\daisysp\daisysp.vcxproj">
-      <Project>{44f4aea3-a6b2-4f03-9c28-34b2336bdf57}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\libdaisy\libdaisy.vcxproj">
-      <Project>{1b07a9d3-1e1b-488a-9817-4b13eeca191c}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
@@ -83,5 +75,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestCallbacks.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\DaisySP\daisysp.vcxproj">
+      <Project>{44f4aea3-a6b2-4f03-9c28-34b2336bdf57}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\libdaisy\libdaisy.vcxproj">
+      <Project>{1b07a9d3-1e1b-488a-9817-4b13eeca191c}</Project>
+    </ProjectReference>
   </ItemGroup>
 </Project>

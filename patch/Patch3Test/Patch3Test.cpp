@@ -136,7 +136,10 @@ int main(void)
     // Start stuff.
     hw.midi.StartReceive();
     hw.StartAdc();
+    hw.SetAudioBlockSize(128);
     hw.StartAudio(AudioCallback);
+    uint8_t cnt;
+    cnt = 0;
     for(;;)
     {
         hw.midi.Listen();
@@ -144,6 +147,8 @@ int main(void)
         while(hw.midi.HasEvents())
         {
             HandleMidiMessage(hw.midi.PopEvent());
+            hw.midi.SendMessage(&cnt, 1);
+            cnt++; // 0-255 repeating just to test output.
         }
         hw.DisplayControls();
     }

@@ -181,6 +181,7 @@ int main(void)
     dsy_audio_set_callback(DSY_AUDIO_INTERNAL, AudioCallback);
     dsy_audio_set_blocksize(DSY_AUDIO_INTERNAL, blocksize);
     hw.seed.adc.Start();
+    dsy_audio_start(DSY_AUDIO_INTERNAL);
     bool ledstate;
     ledstate = true;
     for(;;)
